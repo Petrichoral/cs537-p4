@@ -182,6 +182,14 @@ clone(void(*fcn)(void *, void *), void *arg1, void *arg2, void *stack)
   np->tf->eax = 0;
 
   // Setup new user stack and registers (np->tf->eip, np->tf->esp)
+  np->isThread = 1;
+  //np->uStack = (int)stack;
+  np->tf->eip = (int)fcn;
+  np->tf->esp = (int)stack + PGSIZE;        // point to top of the stack
+  *((int *)(np->tf->esp)) = (int)arg2;      // push 2nd argument
+  *((int *)(np->tf->esp - 4)) = (int)arg1;  // push 1st argument
+  *((int *)(np->tf->esp - 8)) = 0xFFFFFFFF; // push return address
+  np->tf->esp -= 8;                         // move stack pointer to top of stack
 
   for(i = 0; i < NOFILE; i++)
     if(proc->ofile[i])
