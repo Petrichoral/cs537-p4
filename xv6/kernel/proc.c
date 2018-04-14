@@ -183,7 +183,7 @@ clone(void(*fcn)(void *, void *), void *arg1, void *arg2, void *stack)
 
   // Setup new user stack and registers (np->tf->eip, np->tf->esp)
   np->isThread = 1;
-  //np->uStack = (int)stack;
+  np->stack = (int)stack;
   np->tf->eip = (int)fcn;
   np->tf->esp = (int)stack + PGSIZE;        // point to top of the stack
   *((int *)(np->tf->esp)) = (int)arg2;      // push 2nd argument
@@ -283,7 +283,7 @@ exit(void)
       // Clean kernel stack of threads
       if (p->isThread == 1) {
         p->state = UNUSED;
-        kfree(p->stack);
+        kfree(p->kstack);
         p->kstack = 0;
       }
       // End student code

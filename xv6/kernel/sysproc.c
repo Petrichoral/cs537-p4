@@ -38,7 +38,7 @@ sys_join(void)
 {
   void** stack;
 
-  if (argint(0, &stack) < 0) {
+  if (argint(0, (int *)&stack) < 0) {
 	return -1;
   }
 

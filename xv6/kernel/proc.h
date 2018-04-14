@@ -76,6 +76,7 @@ struct proc {
   char name[16];               // Process name (debugging)
 
   int isThread;                // STUDENT-CODE
+  int stack;                   // Address of the user stack
 };
 
 // Process memory is laid out contiguously, low addresses first:
