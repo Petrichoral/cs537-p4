@@ -12,6 +12,14 @@ sys_fork(void)
   return fork();
 }
 
+// STUDENT-CODE
+int
+sys_clone(void)
+{
+  // TODO - get arguments using argptr, pass to fork (implemented in proc.c)
+  return fork();
+}
+
 int
 sys_exit(void)
 {

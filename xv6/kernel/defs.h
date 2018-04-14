@@ -98,6 +98,7 @@ int             pipewrite(struct pipe*, char*, int);
 struct proc*    copyproc(struct proc*);
 void            exit(void);
 int             fork(void);
+int             clone(void(*fcn)(void *, void *), void *arg1, void *arg2, void *stack);  // STUDENT-CODE
 int             growproc(int);
 int             kill(int);
 void            pinit(void);

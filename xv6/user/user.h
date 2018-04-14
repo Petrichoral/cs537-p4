@@ -5,6 +5,7 @@ struct stat;
 
 // system calls
 int fork(void);
+int clone(void(*fcn)(void *, void *), void *, void *, void *);  // STUDENT-CODE
 int exit(void) __attribute__((noreturn));
 int wait(void);
 int pipe(int*);
