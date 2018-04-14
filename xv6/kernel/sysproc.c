@@ -20,6 +20,14 @@ sys_clone(void)
   return fork();
 }
 
+// STUDENT-CODE
+int
+sys_join(void)
+{
+  // TODO - get args using argptr, pass to join() (proc.c)
+  return join();
+}
+
 int
 sys_exit(void)
 {

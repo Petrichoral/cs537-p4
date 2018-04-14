@@ -24,5 +24,6 @@ int sys_wait(void);
 int sys_write(void);
 int sys_uptime(void);
 int sys_clone(void);  // STUDENT-CODE
+int sys_join(void);   // STUDENT-CODE
 
 #endif // _SYSFUNC_H_
