@@ -16,8 +16,20 @@ sys_fork(void)
 int
 sys_clone(void)
 {
-  // TODO - get arguments using argptr, pass to fork (implemented in proc.c)
-  return fork();
+  void(*fcn)(void *, void *);
+  void *arg1;
+  void *arg2;
+  void *stack;
+
+  if (argptr(0, (char **)&fcn, sizeof(void *)) < 0 ||
+    argptr(1, (char **)&arg1, sizeof(void *)) < 0 ||
+    argptr(2, (char **)&arg2, sizeof(void *)) < 0 ||
+    argptr(3, (char **)&stack, sizeof(void *)) < 0) {
+    
+    return -1;
+  }
+
+  return clone(fcn, arg1, arg2, stack);
 }
 
 int

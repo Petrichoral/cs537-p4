@@ -173,12 +173,7 @@ clone(void(*fcn)(void *, void *), void *arg1, void *arg2, void *stack)
     return -1;
 
   // Copy process state from p.
-  if((np->pgdir = copyuvm(proc->pgdir, proc->sz)) == 0){
-    kfree(np->kstack);
-    np->kstack = 0;
-    np->state = UNUSED;
-    return -1;
-  }
+  np->pgdir = proc->pgdir;
   np->sz = proc->sz;
   np->parent = proc;
   *np->tf = *proc->tf;
