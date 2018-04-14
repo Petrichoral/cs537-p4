@@ -168,6 +168,11 @@ clone(void(*fcn)(void *, void *), void *arg1, void *arg2, void *stack)
   int i, pid;
   struct proc *np;
 
+  // check if stack is page aligned
+  if ((int)stack % PGSIZE != 0) {
+    return -1;
+  }
+
   // Allocate process.
   if((np = allocproc()) == 0)
     return -1;
@@ -185,7 +190,7 @@ clone(void(*fcn)(void *, void *), void *arg1, void *arg2, void *stack)
   np->isThread = 1;
   np->stack = (int)stack;
   np->tf->eip = (int)fcn;
-  np->tf->esp = (int)stack + PGSIZE;        // point to top of the stack
+  np->tf->esp = (int)stack + PGSIZE - 4;    // point to top of the stack
   *((int *)(np->tf->esp)) = (int)arg2;      // push 2nd argument
   *((int *)(np->tf->esp - 4)) = (int)arg1;  // push 1st argument
   *((int *)(np->tf->esp - 8)) = 0xFFFFFFFF; // push return address
