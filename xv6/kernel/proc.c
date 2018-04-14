@@ -205,7 +205,6 @@ clone(void(*fcn)(void *, void *), void *arg1, void *arg2, void *stack)
 int
 join(void** stack)
 {
-  /*
   struct proc *p;
   int havekids, pid;
 
@@ -214,7 +213,7 @@ join(void** stack)
   // Scan through table looking for zombie children.
   havekids = 0;
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->parent != proc)
+    if(p->parent != proc || !p->isThread)
       continue;
     havekids = 1;
     if(p->state == ZOMBIE){
@@ -222,7 +221,6 @@ join(void** stack)
       pid = p->pid;
       kfree(p->kstack);
       p->kstack = 0;
-      freevm(p->pgdir);
       p->state = UNUSED;
       p->pid = 0;
       p->parent = 0;
@@ -241,8 +239,8 @@ join(void** stack)
 
   // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(proc, &ptable.lock);  //DOC: wait-sleep
+	*(int*)stack = proc->stack;
   }
-  */
   return -1;
 }
 

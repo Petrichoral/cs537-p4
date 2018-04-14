@@ -24,8 +24,13 @@ sys_clone(void)
 int
 sys_join(void)
 {
-  // TODO - get args using argptr, pass to join() (proc.c)
-  return join();
+  void** stack;
+
+  if (argint(0, &stack) < 0) {
+	return -1;
+  }
+
+  return join(stack);
 }
 
 int
