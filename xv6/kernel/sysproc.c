@@ -32,6 +32,19 @@ sys_clone(void)
   return clone(fcn, arg1, arg2, stack);
 }
 
+// STUDENT-CODE
+int
+sys_join(void)
+{
+  void** stack;
+
+  if (argint(0, &stack) < 0) {
+	return -1;
+  }
+
+  return join(stack);
+}
+
 int
 sys_exit(void)
 {

@@ -24,5 +24,5 @@
 #define SYS_sleep  20
 #define SYS_uptime 21
 #define SYS_clone  22   // STUDENT-CODE
-
+#define SYS_join   23   // STUDENT-CODE
 #endif // _SYSCALL_H_

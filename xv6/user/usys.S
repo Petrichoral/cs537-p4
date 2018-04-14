@@ -29,4 +29,5 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
-SYSCALL(clone)
+SYSCALL(clone) ; STUDENT-CODE
+SYSCALL(join)  ; STUDENT-CODE
