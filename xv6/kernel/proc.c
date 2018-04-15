@@ -322,12 +322,10 @@ wait(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->parent != proc)
         continue;
-      /* Commented out due to uncertainty of necessity.
       //STUDENT-CODE
       // We only wait for child processes, not threads.
       if(p->isThread)
         continue;
-      */
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.

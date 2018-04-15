@@ -38,7 +38,7 @@ sys_join(void)
 {
   void** stack;
 
-  if (argint(0, (int *)&stack) < 0) {
+  if (argptr(0, (char**)&stack, sizeof(void*)) < 0) {
 	return -1;
   }
 
