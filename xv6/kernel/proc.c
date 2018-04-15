@@ -234,6 +234,7 @@ join(void** stack)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+		*(int*)stack = p->stack;
         release(&ptable.lock);
         return pid;
       }
@@ -245,11 +246,10 @@ join(void** stack)
       return -1;
     }
 
-  // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+    // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(proc, &ptable.lock);  //DOC: wait-sleep
     *(int*)stack = proc->stack;
   }
-  return -1;
 }
 
 // Exit the current process.  Does not return.
