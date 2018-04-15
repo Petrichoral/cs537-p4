@@ -4,6 +4,9 @@
 #include "user.h"
 #include "x86.h"
 
+uint threads[64];
+int index = 0;
+
 char*
 strcpy(char *s, char *t)
 {
@@ -107,11 +110,18 @@ memmove(void *vdst, void *vsrc, int n)
 int 
 thread_create(void (*start_routine)(void *, void *), void *arg1, void *arg2)
 {
-  return poo;
+  void *stack = malloc(4096);
+  if (stack == 0) {
+    return -1;
+  }
+  threads[index++] = (uint)stack;
+  return clone(start_routine, arg1, arg2, stack);
 } 
 
 int
 thread_join()
 {
-  return poo;
+  int pid = join((void**)threads[--index]);
+  free((void**)threads[--index]);
+  return pid;
 }
