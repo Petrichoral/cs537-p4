@@ -4,8 +4,8 @@
 #include "user.h"
 #include "x86.h"
 
-uint threads[64];
-int index = 0;
+void* memunits[64], * ustacks[64];
+int tindex = -1;
 
 char*
 strcpy(char *s, char *t)
@@ -110,18 +110,29 @@ memmove(void *vdst, void *vsrc, int n)
 int 
 thread_create(void (*start_routine)(void *, void *), void *arg1, void *arg2)
 {
-  void *stack = malloc(4096);
-  if (stack == 0) {
-    return -1;
+  tindex++;
+  if (tindex > 63) {
+     printf(1, "More than 63 threads were created\n");
+     return -1;
   }
-  threads[index++] = (uint)stack;
-  return clone(start_routine, arg1, arg2, stack);
+  memunits[tindex] = malloc(2*4096);
+  if ((uint)memunits[tindex] == 0)
+    return -1;
+  ustacks[tindex] = (void*)((uint)memunits[tindex] + (4096 - (uint)memunits[tindex] % 4096));
+  return clone(start_routine, arg1, arg2, ustacks[tindex]);
 } 
 
 int
 thread_join()
 {
-  int pid = join((void**)threads[--index]);
-  free((void**)threads[--index]);
+  // Some problem in here with freeing threads. Getting a page fault
+  if (tindex < 0) {
+    printf(1, "Ran out of threads.\n");
+    return -1;
+  }
+  int pid = join((void**)ustacks[tindex]);
+  free((void*)memunits[tindex]);
+  printf(1, "%d\n", tindex);
+  tindex--;
   return pid;
 }

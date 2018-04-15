@@ -213,7 +213,6 @@ clone(void(*fcn)(void *, void *), void *arg1, void *arg2, void *stack)
 int
 join(void** stack)
 {
-  cprintf("Join() called.\n");
   struct proc *p;
   int havekids, pid;
 
@@ -227,7 +226,6 @@ join(void** stack)
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
-		cprintf("Join() found a zombie child thread.\n");
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
@@ -241,15 +239,12 @@ join(void** stack)
         return pid;
       }
     }
-	cprintf("Join() didn't find a zombie child.\n");
     // No point waiting if we don't have any children.
     if(!havekids || proc->killed){
-      cprintf("Join() found that we didn't have any threads to wait for.\n");
       release(&ptable.lock);
       return -1;
     }
 
-	cprintf("Join will wait for the children to exit.\n");
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(proc, &ptable.lock);  //DOC: wait-sleep
     *(int*)stack = proc->stack;
