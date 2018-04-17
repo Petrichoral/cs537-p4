@@ -106,17 +106,34 @@ userinit(void)
 int
 growproc(int n)
 {
+  struct proc *p;  // STUDENT-CODE
   uint sz;
   
+  acquire(&ptable.lock);  // STUDENT-CODE
+  
   sz = proc->sz;
+  
   if(n > 0){
-    if((sz = allocuvm(proc->pgdir, sz, sz + n)) == 0)
+    if((sz = allocuvm(proc->pgdir, sz, sz + n)) == 0) {
+      release(&ptable.lock);  // STUDENT-CODE
       return -1;
-  } else if(n < 0){
-    if((sz = deallocuvm(proc->pgdir, sz, sz + n)) == 0)
-      return -1;
+    }
   }
-  proc->sz = sz;
+  else if(n < 0){
+    if((sz = deallocuvm(proc->pgdir, sz, sz + n)) == 0) {
+      release(&ptable.lock);  // STUDENT-CODE
+      return -1;
+    }
+  }
+  
+  // STUDENT-CODE - loop through page table and update sz for all shared members
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if (proc->pgdir == p->pgdir) {
+      p->sz = sz;
+    }
+  }
+  release(&ptable.lock);  // STUDENT-CODE
+  
   switchuvm(proc);
   return 0;
 }
