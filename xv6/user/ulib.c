@@ -4,7 +4,8 @@
 #include "user.h"
 #include "x86.h"
 
-void* memunits[64], * ustacks[64];
+uint memunits[64];
+uint ustacks[64];
 int tindex = -1;
 
 char*
@@ -111,28 +112,75 @@ int
 thread_create(void (*start_routine)(void *, void *), void *arg1, void *arg2)
 {
   tindex++;
+  //printf(1, "Incremented tindex: %d\n", tindex);
   if (tindex > 63) {
      printf(1, "More than 63 threads were created\n");
+     tindex--;
      return -1;
   }
-  memunits[tindex] = malloc(2*4096);
-  if ((uint)memunits[tindex] == 0)
-    return -1;
-  ustacks[tindex] = (void*)((uint)memunits[tindex] + (4096 - (uint)memunits[tindex] % 4096));
-  return clone(start_routine, arg1, arg2, ustacks[tindex]);
+
+  memunits[tindex] = (uint)malloc(2*4096);
+
+  if (memunits[tindex] < 1) {
+    tindex--;
+    return-1;
+  }
+
+  ustacks[tindex] = memunits[tindex];
+  ustacks[tindex] += 4096 - (ustacks[tindex] % 4096);
+  //printf(1, "Creating thread. Index: %d, Stack: %p\n", tindex, ustacks[tindex]);
+  int pid = clone(start_routine, arg1, arg2, (void*)ustacks[tindex]);
+
+  if (pid == -1) {
+    free((void*)ustacks[tindex]);
+    tindex--;
+  }
+
+  return pid;
 } 
 
 int
 thread_join()
 {
-  // Some problem in here with freeing threads. Getting a page fault
+
   if (tindex < 0) {
     printf(1, "Ran out of threads.\n");
     return -1;
   }
-  int pid = join((void**)ustacks[tindex]);
+
+  //printf(1, "Joining thread. Index: %d, Stack: %p\n", tindex, ustacks[tindex]);
+  int pid = join((void**)&ustacks[tindex]);
   free((void*)memunits[tindex]);
-  printf(1, "%d\n", tindex);
   tindex--;
   return pid;
+}
+
+static inline int FetchAndAdd(int* variable, int value)
+{
+  __asm__ volatile("lock; xaddl %0, %1"
+  : "+r" (value), "+m" (*variable) // input+output
+  : // No input-only
+  : "memory"
+  );
+  return value;
+}
+
+void
+lock_init(lock_t *lock)
+{
+  lock->ticket = 0;
+  lock->turn = 0;
+}
+
+void
+lock_acquire(lock_t *lock)
+{
+  int myturn = FetchAndAdd(&lock->ticket, 1);
+  while (lock->turn != myturn); //spin
+}
+
+void 
+lock_release(lock_t *lock)
+{
+  lock->turn += 1;
 }

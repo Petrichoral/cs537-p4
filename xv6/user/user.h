@@ -2,6 +2,10 @@
 #define _USER_H_
 
 struct stat;
+typedef struct __lock_t {
+  int ticket;
+  int turn;
+} lock_t;
 
 // system calls
 int fork(void);
@@ -43,6 +47,9 @@ void free(void*);
 int atoi(const char*);
 int thread_create(void (*)(void *, void *), void *, void *);    // STUDENT-CODE
 int thread_join(void);                                          // STUDENT-CODE
+void lock_init(lock_t *);                                       // STUDENT-CODE
+void lock_acquire(lock_t *);                                    // STUDENT-CODE
+void lock_release(lock_t *);                                    // STUDENT-CODE
 
 #endif // _USER_H_
 

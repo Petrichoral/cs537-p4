@@ -144,6 +144,10 @@ fork(void)
   np->sz = proc->sz;
   np->parent = proc;
   *np->tf = *proc->tf;
+  //STUDENT-CODE
+  np->isThread = 0;
+  np->stack = 0;
+  np->hasThreads = 0;
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -178,6 +182,7 @@ clone(void(*fcn)(void *, void *), void *arg1, void *arg2, void *stack)
     return -1;
 
   // Copy process state from p.
+  proc->hasThreads = 1;
   np->pgdir = proc->pgdir;
   np->sz = proc->sz;
   np->parent = proc;
@@ -234,6 +239,8 @@ join(void** stack)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+        p->isThread = 0;
+        p->hasThreads = 0;
 		*(int*)stack = p->stack;
         release(&ptable.lock);
         return pid;
@@ -285,11 +292,11 @@ exit(void)
       p->parent = initproc;
       // STUDENT-CODE
       // Clean kernel stack of threads
-      if (p->isThread == 1) {
-        p->state = UNUSED;
-        kfree(p->kstack);
-        p->kstack = 0;
-      }
+      //if (p->isThread == 1) {
+      //  p->state = UNUSED;
+      //  kfree(p->kstack);
+      //  p->kstack = 0;
+      //}
       // End student code
       if(p->state == ZOMBIE)
         wakeup1(initproc);
@@ -323,11 +330,14 @@ wait(void)
         continue;
       havekids = 1;
       if(p->state == ZOMBIE){
+        //STUDENT-CODE
+        //We don't free programs that have threads
         // Found one.
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
-        freevm(p->pgdir);
+        if (!p->hasThreads)
+          freevm(p->pgdir);
         p->state = UNUSED;
         p->pid = 0;
         p->parent = 0;
