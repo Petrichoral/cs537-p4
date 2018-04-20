@@ -1,6 +1,7 @@
 #include "mapreduce.h"
+#include <stdlib.h>
 
-void *get_next(char *key, int num_partition);
+char *get_next(char *key, int num_partition);
 
 void MR_Emit(char *key, char *value) {
 
@@ -20,6 +21,6 @@ void MR_Run(int argc, char *argv[], Mapper map, int num_mappers,
 
 }
 
-void *get_next(char *key, int num_partition) {
-    
+char *get_next(char *key, int num_partition) {
+    return NULL;
 }
